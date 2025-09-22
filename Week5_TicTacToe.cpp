@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cctype>
 using namespace std;
 
 char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -6,7 +7,7 @@ int i = 0;
 bool playerWin;
 
 void display();
-void choose(int player);
+int choose(int player);
 void win(int player);
 
 int main(){
@@ -37,24 +38,20 @@ void display(){
     cout << " " << box[7] << " | " << box[8] << " | " << box[9] << endl << endl;
 }
 
-void choose(int player){
+int choose(int player){
 
     // Different output depending on player
     cout << "Player " << player <<", enter a number to choose a square: ";
 
-    while (true){
-        cin >> i;       // Choose a square
-        if (i < 1 || i > 9){
-            cout << "That is not a valid input. Try again: ";
-        }else{
-            break;
-        }
-    }
+    cin >> i;       // Choose a square
 
-    while (true){
+    if (i < 1 || i > 9 || !isdigit(i)){
+        cout << "That is not a valid input. Try again." << endl;
+        return choose(player);
+    }else{
         if (box[i] == 'X' || box[i] == 'O'){
-            cout << "That space is taken. Try again: ";
-            cin >> i;
+            cout << "That space is taken. Try again." << endl;
+            return choose(player);
         }else if (box[i] != 'X' || box[i] != 'O'){
             if (player == 1){
                 box[i] = 'X';
@@ -63,9 +60,10 @@ void choose(int player){
                 box[i] = 'O';
                 win(2);
             }
-            break;
         }
     }
+
+    return 1;
 }
 
 void win(int player){
