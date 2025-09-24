@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <cctype>
 using namespace std;
 
@@ -45,7 +46,16 @@ int choose(int player){
 
     cin >> i;       // Choose a square
 
-    if (i < 1 || i > 9 || !isdigit(i)){
+    if (cin.fail()){
+        cout << "That is not a valid input. Try again." << endl;
+        cin.clear();
+        while (i){
+            cin.ignore(1, '\n');
+        }
+        return choose(player);
+    }
+
+    if (i < 1 || i > 9){
         cout << "That is not a valid input. Try again." << endl;
         return choose(player);
     }else{
