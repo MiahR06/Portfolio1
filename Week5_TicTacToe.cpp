@@ -7,20 +7,24 @@ char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 int i = 0;
 bool playerWin;
 
-void display();
-int choose(int player);
-void win(int player);
+void instructions();            // Displays instructions
+void display();                 // Displays board
+int chooseSquare(int player, char playerSymbol);           // Allows player to choose square
+int checkInput(int i, int player, char playerSymbol);
+int changeSquare(int i, int player, char playerSymbol);
+
+void win(int player, char playerSymbol);
 
 int main(){
 
     while (true){
         display();
-        choose(1);
+        chooseSquare(1, 'X');
         if (playerWin == true){
             break;
         }
         display();
-        choose(2);
+        chooseSquare(2, 'O');
         if (playerWin == true){
             break;
         }
@@ -30,112 +34,91 @@ int main(){
 
 }
 
-void display(){
+void instructions(){
+    cout << "Welcome! Let's start this game of Tic Tac Toe!\n\n";
 
-    cout << "\n " << box[1] << " | " << box[2] << " | " << box[3] << endl;
-    cout << "-----------" << endl; 
-    cout << " " << box[4] << " | " << box[5] << " | " << box[6] << endl;
-    cout << "-----------" << endl; 
-    cout << " " << box[7] << " | " << box[8] << " | " << box[9] << endl << endl;
+    cout << "HOW TO PLAY\n";
+    cout << "-------------------------------\n\n";
+    cout << "This is a two player game where you will take turns\nchoosing an available square until one player wins.\n\n";
+    cout << "Player 1 is X, player 2 is O.\n\n";
 }
 
-int choose(int player){
+void display(){
+
+    cout << "\n " << box[1] << " | " << box[2] << " | " << box[3] << "\n";
+    cout << "-----------" << "\n"; 
+    cout << " " << box[4] << " | " << box[5] << " | " << box[6] << "\n";
+    cout << "-----------" << "\n"; 
+    cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
+}
+
+int chooseSquare(int player, char playerSymbol){
 
     // Different output depending on player
     cout << "Player " << player <<", enter a number to choose a square: ";
 
-    cin >> i;       // Choose a square
+    cin >> i;       // Choose a square   
+    return checkInput(i, player, playerSymbol);
+}
+
+int checkInput(int i, int player, char playerSymbol){
 
     if (cin.fail()){
-        cout << "That is not a valid input. Try again." << endl;
         cin.clear();
-        while (i){
-            cin.ignore(1, '\n');
-        }
-        return choose(player);
-    }
+        cin.ignore(10000, '\n');        // Chose a large number to lessen the chances of a long input going through
 
-    if (i < 1 || i > 9){
-        cout << "That is not a valid input. Try again." << endl;
-        return choose(player);
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
+    }else if (i < 1 || i > 9){
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
     }else{
-        if (box[i] == 'X' || box[i] == 'O'){
-            cout << "That space is taken. Try again." << endl;
-            return choose(player);
-        }else if (box[i] != 'X' || box[i] != 'O'){
-            if (player == 1){
-                box[i] = 'X';
-                win(1);
-            }else if (player == 2){
-                box[i] = 'O';
-                win(2);
-            }
-        }
+        return changeSquare(i, player, playerSymbol);
     }
 
     return 1;
 }
 
-void win(int player){
+int changeSquare(int i, int player, char playerSymbol){
 
-    if (player == 1){
-        if (box[1] == 'X' && box[2] == 'X' && box[3] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[4] == 'X' && box[5] == 'X' && box[6] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[7] == 'X' && box[8] == 'X' && box[9] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[1] == 'X' && box[4] == 'X' && box[7] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[2] == 'X' && box[5] == 'X' && box[8] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[3] == 'X' && box[6] == 'X' && box[9] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[1] == 'X' && box[5] == 'X' && box[9] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else if(box[3] == 'X' && box[5] == 'X' && box[7] == 'X'){
-            cout << "\nPlayer 1 wins!" << endl;
-            playerWin = true;
-        }else{
-            playerWin = false;
-        }
-
-    }else if (player == 2){
-        if (box[1] == 'O' && box[2] == 'O' && box[3] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[4] == 'O' && box[5] == 'O' && box[6] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[7] == 'O' && box[8] == 'O' && box[9] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[1] == 'O' && box[4] == 'O' && box[7] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[2] == 'O' && box[5] == 'O' && box[8] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[3] == 'O' && box[6] == 'O' && box[9] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[1] == 'O' && box[5] == 'O' && box[9] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else if(box[3] == 'O' && box[5] == 'O' && box[7] == 'O'){
-            cout << "\nPlayer 2 wins!" << endl;
-            playerWin = true;
-        }else{
-            playerWin = false;
-        }
+    if (box[i] == 'X' || box[i] == 'O'){
+        cout << "\nThat space is taken. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
+    }else if (box[i] != 'X' || box[i] != 'O'){
+        box[i] = playerSymbol;
+        win(player, playerSymbol);
     }
-
     
+    return 1;
+}
+
+void win(int player, char playerSymbol){
+
+    if (box[1] == playerSymbol && box[2] == playerSymbol && box[3] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[4] == playerSymbol && box[5] == playerSymbol && box[6] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[7] == playerSymbol && box[8] == playerSymbol && box[9] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[1] == playerSymbol && box[4] == playerSymbol && box[7] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[2] == playerSymbol && box[5] == playerSymbol && box[8] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[3] == playerSymbol && box[6] == playerSymbol && box[9] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[1] == playerSymbol && box[5] == playerSymbol && box[9] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else if(box[3] == playerSymbol && box[5] == playerSymbol && box[7] == playerSymbol){
+        cout << "\nPlayer " << player << " wins!\n";
+        playerWin = true;
+    }else{
+        playerWin = false;
+    }  
 }
