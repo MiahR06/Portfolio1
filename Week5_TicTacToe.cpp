@@ -1,46 +1,54 @@
 #include <iostream>
 #include <string>
-#include <cctype>
+#include <chrono>
+#include <thread>
 using namespace std;
 
 char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-int i = 0;
-bool playerWin;
+int i = 0;      // Used to choose a square
+int turn = 0;   // Keeps track of turns
+bool gameEnd;
 
 void instructions();            // Displays instructions
 void display();                 // Displays board
-int chooseSquare(int player, char playerSymbol);           // Allows player to choose square
-int checkInput(int i, int player, char playerSymbol);
-int changeSquare(int i, int player, char playerSymbol);
+int chooseSquare(int player, char playerSymbol);            // Allows player to choose square
+int checkInput(int i, int player, char playerSymbol);       // Checks player input
+int changeSquare(int i, int player, char playerSymbol);     // 
 
+void checkTie(int player, char playerSymbol);
 void win(int player, char playerSymbol);
 
 int main(){
 
+    instructions();
+
     while (true){
         display();
         chooseSquare(1, 'X');
-        if (playerWin == true){
+        if (gameEnd == true){
             break;
         }
         display();
         chooseSquare(2, 'O');
-        if (playerWin == true){
+        if (gameEnd == true){
             break;
         }
     }
 
-    display();
-
 }
 
 void instructions(){
+
     cout << "Welcome! Let's start this game of Tic Tac Toe!\n\n";
 
     cout << "HOW TO PLAY\n";
     cout << "-------------------------------\n\n";
-    cout << "This is a two player game where you will take turns\nchoosing an available square until one player wins.\n\n";
+    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\n\n";
     cout << "Player 1 is X, player 2 is O.\n\n";
+
+    cout << "The game will start in a few seconds.\nHave fun!";
+    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
+    cout << "\n";
 }
 
 void display(){
@@ -87,38 +95,51 @@ int changeSquare(int i, int player, char playerSymbol){
     }else if (box[i] != 'X' || box[i] != 'O'){
         box[i] = playerSymbol;
         win(player, playerSymbol);
+        turn++;
     }
     
     return 1;
 }
 
+
 void win(int player, char playerSymbol){
 
     if (box[1] == playerSymbol && box[2] == playerSymbol && box[3] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[4] == playerSymbol && box[5] == playerSymbol && box[6] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[7] == playerSymbol && box[8] == playerSymbol && box[9] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[1] == playerSymbol && box[4] == playerSymbol && box[7] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[2] == playerSymbol && box[5] == playerSymbol && box[8] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[3] == playerSymbol && box[6] == playerSymbol && box[9] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[1] == playerSymbol && box[5] == playerSymbol && box[9] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
     }else if(box[3] == playerSymbol && box[5] == playerSymbol && box[7] == playerSymbol){
-        cout << "\nPlayer " << player << " wins!\n";
-        playerWin = true;
+        display();
+        cout << "Player " << player << " wins!\nThank you for playing!";
+        gameEnd = true;
+    }else if (turn == 8){
+        cout << "\nThe game is a tie!\nThank you for playing!";
+        gameEnd = true;
     }else{
-        playerWin = false;
+        gameEnd = false;
     }  
 }
