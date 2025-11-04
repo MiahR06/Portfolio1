@@ -23,7 +23,7 @@ char p1Mark, p2Mark, p1ClassChoose, p2ClassChoose, choice;
 string p1Class, p2Class;
 
 // Portfolio 1 functions
-void instructions();
+void instructionsReg();
 void display();
 int chooseSquare(int player, char playerSymbol);
 int checkInput(int i, int player, char playerSymbol);
@@ -31,13 +31,14 @@ int changeSquare(int i, int player, char playerSymbol);
 void win(int player, char playerSymbol);
 
 // Portfolio 2 functions
+void instructionBattle(void);
 bool checkMark(char mark, int player);
 void chooseMark(int player);
 bool checkClass(int classChoose, int player);
 void chooseClass(int player);
 void chooseMove(int player);
 void alchemist(int player);
-void paladinCheck(int player, int sq1, int sq2)
+void paladinCheck(int player, int sq1, int sq2);
 void paladin(int player);
 void menu();
 void regularGame();
@@ -56,7 +57,7 @@ int main(){
 }
 
 
-void instructions(void){
+void instructionsReg(void){
 
     cout << "Let's start this regular game of Tic Tac Toe!\n\n";
 
@@ -66,6 +67,19 @@ void instructions(void){
     cout << "Player 1 is X, player 2 is O.\n\n";
 
     cout << "The game will start in a few seconds.\nHave fun!";
+    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
+    cout << "\n";
+}
+
+void instructionBattle(void){
+
+    cout << "Let's start this battle game of Tic Tac Toe!\n\n";
+
+    cout << "HOW TO PLAY\n";
+    cout << "-------------------------------\n\n";
+    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\nHowever, you will each have an ability to use.\n\n";
+
+    cout << "You will choose your marks & classes in a few seconds.\nHave fun!";
     this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
     cout << "\n";
 }
@@ -161,10 +175,9 @@ void win(int player, char playerSymbol){
     }  
 }
 
-
-
 bool checkMark(char mark, int player){
-    if (mark != isalpha(mark) || mark != '?' || mark != '!' || mark != '*' || mark != '~' || mark != '$' || mark != '%' || mark != '#'){
+
+    if (isalpha(mark) || mark != '?' || mark != '!' || mark != '*' || mark != '~' || mark != '$' || mark != '%' || mark != '#'){
         clearInput(mark);
         cout << "That is not a valid mark.";
         chooseMark(player);
@@ -183,7 +196,6 @@ void chooseMark(int player){
             p1Mark = mark;
         }
     }else if (player == 2){
-        cin >> p2Mark;
         if (checkMark(p2Mark, 2)){
             p2Mark = mark;
         }
@@ -218,12 +230,16 @@ void chooseClass(int player){
     if (player == 1){
         cin >> p1ClassChoose;
         if (checkClass(p1ClassChoose, 1)){
-            //return p1Class;
+            p1Class = "Alchemist";
+        }else if (checkClass(p1ClassChoose, 2)){
+            p1Class = "Paladin";
         }
     }else if (player == 2){
         cin >> p2ClassChoose;
-        if (checkClass(p2ClassChoose, 2)){
-            //return p2Class;
+        if (checkClass(p2ClassChoose, 1)){
+            p2Class = "Alchemist";
+        }else if (checkClass(p2ClassChoose, 2)){
+            p2Class = "Paladin";
         }
     }
 }
@@ -232,7 +248,7 @@ void chooseMove(int player){
     char ch;
     
     cout << "player " << player <<", would you like to choose a regular move or us ability?\n";
-    cout << "(a) Regular move\n(b) Swap marks\n\n";
+    cout << "(a) Regular move\n(b) Use ability\n\n";
     cout << "Enter a or b: ";
     cin >> ch;
 
@@ -304,16 +320,43 @@ void alchemist(int player){
 void paladinCheck(int player, int sq1, int sq2){
 // To check adjacent squares
 
-    if (box[sq1] == 1){
-        if ((box[sq2] == 2 || box[sq2] == 4 || box[sq2] == 5) && isdigit(box[sq2])){
-            
+    // I don't know how to fix this grid to work
+    int adjacency[10][4] = {
+        {},
+        {2, 4, 5},
+        {1, 3, 5},
+        {2, 5, 6},
+        {1, 5, 7},
+        {1, 2, 3, 4, 6, 7, 8, 9},
+        {3, 5, 9},
+        {4, 5, 8},
+        {5, 7, 9},
+        {5, 6, 8}
+    };
+
+    bool adj = false;
+    for (int i=0; i<4; ++i){
+        if (adjacency[sq1][i] == sq2){
+            adj = true;
+            break;
         }
-    }else if (box[sq1] == 2){
+    }
+    
+    int hold;
 
-    }else if (box[sq1] == 3){
-
-    }else if (box[sq1] == 4){
-
+    if (adj == false){
+        cout << "\nSquare " << sq2 << " is not adjacent to square " << sq1 << ". Try again.\n";
+        paladin(player);
+    }else if (adj == true){
+        box[hold] = box[sq2];
+        box[sq2] = box[sq1];
+        box[sq1] = box[hold];
+        if (player == 1){
+            win(player, p1Mark);
+        }else if (player == 2){
+            win(player, p2Mark);
+        }
+        turn++;
     }
 
 }
@@ -330,12 +373,12 @@ void paladin(int player){
         cout << "\nThere is no mark in square " << sq1 << ". Try again.\n";
         clearInput(sq1);
         clearInput(sq2);
-        paladin();
+        paladin(player);
     }else if (!isdigit(box[sq2])){
         cout << "\nSquare " << sq2 << "is taken. Try again.\n";
         clearInput(sq1);
         clearInput(sq2);
-        paladin();
+        paladin(player);
     }else if (sq1 < 1 || sq1 > 9 || sq2 < 1 || sq2 > 9){
         cout << "Invalid positions. Try again.\n";
         clearInput(sq1);
@@ -346,20 +389,6 @@ void paladin(int player){
     }
 
 }
-/*
-A player can shift either their own mark or an opponent’s mark
-• They must shift the mark to an adjacent square. For example, you can move a mark
-at space 1 to spaces 2, 4, or 5. You cannot move that mark to spaces 3, 6, 7, 8, or 9.
-• A player must shift the mark to an unoccupied square.
-• You do not have to “wrap” squares around the board. In other words, you do not
-have to worry about a player pushing a mark at cell 1 “upwards” or “left”.
-• A player can activate this power once per turn and as many times as they want in
-the game.
-• A player cannot make a move AND shift a mark in the same turn – they must do one
-or the other.
-• The game should stop me if I try to make an invalid special move (e.g. I should not
-be able to shift a mark on turn one since there are no marks on the board).
-*/
 
 void menu(){
     int chooseGame;
@@ -385,7 +414,7 @@ void menu(){
 }
 
 void regularGame(){
-    instructions();
+    instructionsReg();
 
     while (true){
         display();
@@ -402,7 +431,25 @@ void regularGame(){
 }
 
 void battleGame(){
-    
+    instructionBattle();
+    chooseMark(1);
+    chooseMark(2);
+    chooseClass(1);
+    chooseClass(2);
+
+    while (true){
+        display();
+        chooseMove(1);
+        if (gameEnd == true){
+            break;
+        }
+
+        display();
+        chooseMove(2);
+        if (gameEnd == true){
+            break;
+        }
+    }
 }
 
 char closingMenu(char choice){
@@ -418,7 +465,7 @@ char closingMenu(char choice){
     }else{
         cout << "\nInvalid choice.";
         clearInput(choice);
-        closingMenu(choice);
+        return closingMenu(choice);
     }
     return 1;
 }
