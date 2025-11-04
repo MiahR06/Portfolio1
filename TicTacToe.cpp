@@ -31,12 +31,13 @@ int changeSquare(int i, int player, char playerSymbol);
 void win(int player, char playerSymbol);
 
 // Portfolio 2 functions
-bool checkMark(char mark, int player);      // Helper function
+bool checkMark(char mark, int player);
 void chooseMark(int player);
 bool checkClass(int classChoose, int player);
 void chooseClass(int player);
 void chooseMove(int player);
 void alchemist(int player);
+void paladinCheck(int player, int sq1, int sq2)
 void paladin(int player);
 void menu();
 void regularGame();
@@ -97,7 +98,6 @@ int checkInput(int i, int player, char playerSymbol){
         clearInput(i);
         cout << "\nThat is not a valid square. Try again.\n\n";
         return chooseSquare(player, playerSymbol);
-    //}else if(){     // Condition that stops player from entering more than one number
     }else{
         return changeSquare(i, player, playerSymbol);
     }
@@ -257,30 +257,41 @@ void chooseMove(int player){
 }
 
 void alchemist(int player){
-    int box1, box2;
+    int sq1, sq2;
     
     cout << "Choose the first box to swap from: ";
-    cin >> box1;
+    cin >> sq1;
     cout << "Choose the second box to swap with: ";
-    cin >> box2;
+    cin >> sq2;
 
-    if (box[box1] == box[box2]){
+    if (box[sq1] == box[sq2]){
         cout << "Cannot swap the same marks. Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
         alchemist(player);
     }else if (turn == 1 || turn == 2){
         cout << "There are not enough marks to swap. Please make a regular move.\n";
         if (player == 1){
+            clearInput(sq1);
+            clearInput(sq2);
             chooseSquare(player, p1Mark);
         }else if (player == 2){
+            clearInput(sq1);
+            clearInput(sq2);
             chooseSquare(player, p2Mark);
         }
-    }else if (box1 < 1 || box1 > 9 || box2 < 1 || box2 > 9){
+    }else if (sq1 < 1 || sq1 > 9 || sq2 < 1 || sq2 > 9){
         cout << "Invalid positions. Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
         alchemist(player);
-    }else if (isdigit(box[box1]) || isdigit(box[box2])){
-        cout << "";
+    }else if (isdigit(box[sq1]) || isdigit(box[sq2])){
+        cout << "\nThere is no mark in one or both of these squares. Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
+        alchemist(player);
     }else{
-        swap(box[box1], box[box2]);
+        swap(box[sq1], box[sq2]);
         if (player == 1){
             win(player, p1Mark);
         }else if (player == 2){
@@ -290,9 +301,65 @@ void alchemist(int player){
     }
 }
 
-void paladin(int player){
+void paladinCheck(int player, int sq1, int sq2){
+// To check adjacent squares
+
+    if (box[sq1] == 1){
+        if ((box[sq2] == 2 || box[sq2] == 4 || box[sq2] == 5) && isdigit(box[sq2])){
+            
+        }
+    }else if (box[sq1] == 2){
+
+    }else if (box[sq1] == 3){
+
+    }else if (box[sq1] == 4){
+
+    }
 
 }
+
+void paladin(int player){
+    int sq1, sq2;
+    
+    cout << "Choose the first box to shift from: ";
+    cin >> sq1;
+    cout << "Choose the second box to shift to: ";
+    cin >> sq2;
+
+    if (isdigit(box[sq1])){
+        cout << "\nThere is no mark in square " << sq1 << ". Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
+        paladin();
+    }else if (!isdigit(box[sq2])){
+        cout << "\nSquare " << sq2 << "is taken. Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
+        paladin();
+    }else if (sq1 < 1 || sq1 > 9 || sq2 < 1 || sq2 > 9){
+        cout << "Invalid positions. Try again.\n";
+        clearInput(sq1);
+        clearInput(sq2);
+        paladin(player);
+    }else{
+        paladinCheck(player, sq1, sq2);
+    }
+
+}
+/*
+A player can shift either their own mark or an opponent’s mark
+• They must shift the mark to an adjacent square. For example, you can move a mark
+at space 1 to spaces 2, 4, or 5. You cannot move that mark to spaces 3, 6, 7, 8, or 9.
+• A player must shift the mark to an unoccupied square.
+• You do not have to “wrap” squares around the board. In other words, you do not
+have to worry about a player pushing a mark at cell 1 “upwards” or “left”.
+• A player can activate this power once per turn and as many times as they want in
+the game.
+• A player cannot make a move AND shift a mark in the same turn – they must do one
+or the other.
+• The game should stop me if I try to make an invalid special move (e.g. I should not
+be able to shift a mark on turn one since there are no marks on the board).
+*/
 
 void menu(){
     int chooseGame;
