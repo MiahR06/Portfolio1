@@ -1,3 +1,5 @@
+// NOTE: I wasn't sure how to properly implement turns, so I just added a set counter. Sorry.
+
 #include <iostream>
 #include <string>
 #include <chrono>
@@ -64,7 +66,7 @@ void instructionsReg(void){
     cout << "HOW TO PLAY\n";
     cout << "-------------------------------\n\n";
     cout << "This is a two player game where you will take turns choosing an available square until one player wins.\n\n";
-    cout << "Player 1 is X, player 2 is O.\n\n";
+    cout << "Player 1 is X, player 2 is O. Choose moves wisely, as you will only have 8 turns.\n\n";
 
     cout << "The game will start in a few seconds.\nHave fun!";
     this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
@@ -77,10 +79,10 @@ void instructionBattle(void){
 
     cout << "HOW TO PLAY\n";
     cout << "-------------------------------\n\n";
-    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\nHowever, you will each have an ability to use.\n\n";
+    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\nHowever, you will each have an ability to use.\nChoose moves wisely, as you will only have 8 turns.\n\n";
 
     cout << "You will choose your marks & classes in a few seconds.\nHave fun!";
-    //this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
+    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
     cout << "\n";
 }
 
@@ -91,6 +93,7 @@ void display(void){
     cout << " " << box[4] << " | " << box[5] << " | " << box[6] << "\n";
     cout << "-----------" << "\n"; 
     cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
+    cout << "Turn: " << turn << "\n\n";
 }
 
 int chooseSquare(int player, char playerSymbol){
@@ -168,7 +171,8 @@ void win(int player, char playerSymbol){
         cout << "Player " << player << " wins!\nThank you for playing!";
         gameEnd = true;
     }else if (turn == 8){
-        cout << "\nThe game is a tie!\nThank you for playing!";
+        display();
+        cout << "\nThe game is a tie!\nThank you for playing!\n";
         gameEnd = true;
     }else{
         gameEnd = false;
@@ -247,10 +251,7 @@ void chooseMove(int player){
     cout << "Enter a or b: ";
     cin >> ch;
 
-    if (cin.fail()){
-        clearInput(ch);
-        chooseMove(player);
-    }else if (ch == 'b'){
+    if (ch == 'b'){
         if (player == 1){
             if (p1Class == "Alchemist"){
                 alchemist(1);
@@ -271,6 +272,10 @@ void chooseMove(int player){
             chooseSquare(player, p2Mark);
         }
         
+    }else{
+        clearInput(ch);
+        cout << "That is not a valid move.\n\n";
+        chooseMove(player);
     }
 }
 
@@ -461,6 +466,7 @@ char closingMenu(char choice){
 
     if (choice == 'y' || choice == 'Y'){
         choice = 'y';
+        cout << "\n";
         return choice;
     }else if (choice == 'n' || choice == 'N'){
         cout << "\nThanks for playing!";
