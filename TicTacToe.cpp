@@ -51,7 +51,7 @@ int main(){
     do{
         menu();
         closingMenu(choice);
-    }while (choice == 'y');
+    }while (choice != 'n');
 
     return 0;
 }
@@ -73,14 +73,14 @@ void instructionsReg(void){
 
 void instructionBattle(void){
 
-    cout << "Let's start this battle game of Tic Tac Toe!\n\n";
+    cout << "\nLet's start this battle game of Tic Tac Toe!\n\n";
 
     cout << "HOW TO PLAY\n";
     cout << "-------------------------------\n\n";
     cout << "This is a two player game where you will take turns choosing an available square until one player wins.\nHowever, you will each have an ability to use.\n\n";
 
     cout << "You will choose your marks & classes in a few seconds.\nHave fun!";
-    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
+    //this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
     cout << "\n";
 }
 
@@ -121,10 +121,10 @@ int checkInput(int i, int player, char playerSymbol){
 
 int changeSquare(int i, int player, char playerSymbol){
 
-    if (box[i] == 'X' || box[i] == 'O'){
+    if (!isdigit(box[i])){
         cout << "\nThat space is taken. Try again.\n\n";
         return chooseSquare(player, playerSymbol);
-    }else if (box[i] != 'X' || box[i] != 'O'){
+    }else if (isdigit(box[i])){
         box[i] = playerSymbol;
         win(player, playerSymbol);
         turn++;
@@ -176,15 +176,15 @@ void win(int player, char playerSymbol){
 }
 
 bool checkMark(char mark, int player){
-
-    if (isalpha(mark) || mark != '?' || mark != '!' || mark != '*' || mark != '~' || mark != '$' || mark != '%' || mark != '#'){
-        clearInput(mark);
-        cout << "That is not a valid mark.";
-        chooseMark(player);
+    
+    if (isalpha(mark) || mark == '?' || mark == '!' || mark == '*' || mark == '~' || mark == '$' || mark == '%' || mark == '#'){
+        return true; 
     }else{
-        return (isalpha(mark) || mark == '?' || mark == '!' || mark == '*' || mark == '~' || mark == '$' || mark == '%' || mark == '#');
+        clearInput(mark);
+        cout << "That is not a valid mark.\n";
+        chooseMark(player);
     }
-    return 1;
+    return false;
 }
 
 void chooseMark(int player){
@@ -192,54 +192,49 @@ void chooseMark(int player){
     cout << "\nPlayer " << player << ", choose your mark for this game: ";
     cin >> mark;
     if (player == 1){
-        if (checkMark(p1Mark, 1)){
+        if (checkMark(mark, player)){
             p1Mark = mark;
         }
     }else if (player == 2){
-        if (checkMark(p2Mark, 2)){
+        if (checkMark(mark, player)){
             p2Mark = mark;
         }
     }
 }
 
 bool checkClass(int classChoose, int player){
-    if (classChoose != 1 && classChoose != 2){
-        clearInput(classChoose);
-        cout << "That is not a valid class.";
-        chooseClass(player);
+        
+    if (classChoose == 1 || classChoose == 2){
+        return true;
     }else{
-        if (classChoose == 1){
-            if (player == 1){
-                return p1Class == "Alchemist";
-            }else if (player == 2){
-                return p2Class == "Alchemist";
-            }
-        }else if (classChoose == 2){
-            if (player == 1){
-                return p1Class == "Paladin";
-            }else if (player == 2){
-                return p2Class == "Paladin";
-            }
-        }
+        clearInput(classChoose);
+        cout << "That is not a valid class.\n";
+        chooseClass(player);
     }
-    return 1;
+    return false;
 }
 
 void chooseClass(int player){
+    int classChoose;
     cout << "\nPlayer " << player << ", choose your archetype, (1) Alchemist, (2) Paladin: ";
+    cin >> classChoose;
     if (player == 1){
-        cin >> p1ClassChoose;
-        if (checkClass(p1ClassChoose, 1)){
-            p1Class = "Alchemist";
-        }else if (checkClass(p1ClassChoose, 2)){
-            p1Class = "Paladin";
+        if (checkClass(classChoose, player)){
+            p1ClassChoose = classChoose;
+            if (p1ClassChoose == 1){
+                p1Class = "Alchemist";
+            }else if (p1ClassChoose == 2){
+                p1Class = "Paladin";
+            }
         }
     }else if (player == 2){
-        cin >> p2ClassChoose;
-        if (checkClass(p2ClassChoose, 1)){
-            p2Class = "Alchemist";
-        }else if (checkClass(p2ClassChoose, 2)){
-            p2Class = "Paladin";
+        if (checkClass(classChoose, player)){
+            p2ClassChoose = classChoose;
+            if (p2ClassChoose == 1){
+                p2Class = "Alchemist";
+            }else if (p2ClassChoose == 2){
+                p2Class = "Paladin";
+            }
         }
     }
 }
@@ -247,7 +242,7 @@ void chooseClass(int player){
 void chooseMove(int player){
     char ch;
     
-    cout << "player " << player <<", would you like to choose a regular move or us ability?\n";
+    cout << "Player " << player <<", would you like to choose a regular move or us ability?\n";
     cout << "(a) Regular move\n(b) Use ability\n\n";
     cout << "Enter a or b: ";
     cin >> ch;
@@ -255,7 +250,7 @@ void chooseMove(int player){
     if (cin.fail()){
         clearInput(ch);
         chooseMove(player);
-    }else if (ch == 'a'){
+    }else if (ch == 'b'){
         if (player == 1){
             if (p1Class == "Alchemist"){
                 alchemist(1);
@@ -269,6 +264,13 @@ void chooseMove(int player){
                 paladin(2);
             }
         }
+    }else if (ch == 'a'){
+        if (player == 1){
+            chooseSquare(player, p1Mark);
+        }else if (player == 2){
+            chooseSquare(player, p2Mark);
+        }
+        
     }
 }
 
@@ -286,7 +288,7 @@ void alchemist(int player){
         clearInput(sq2);
         alchemist(player);
     }else if (turn == 1 || turn == 2){
-        cout << "There are not enough marks to swap. Please make a regular move.\n";
+        cout << "There are not enough marks to swap. Please make a regular move. (Press enter)\n";
         if (player == 1){
             clearInput(sq1);
             clearInput(sq2);
@@ -320,29 +322,30 @@ void alchemist(int player){
 void paladinCheck(int player, int sq1, int sq2){
 // To check adjacent squares
 
-    // I don't know how to fix this grid to work
-    int adjacency[10][4] = {
-        {},
-        {2, 4, 5},
-        {1, 3, 5},
-        {2, 5, 6},
-        {1, 5, 7},
-        {1, 2, 3, 4, 6, 7, 8, 9},
-        {3, 5, 9},
-        {4, 5, 8},
-        {5, 7, 9},
-        {5, 6, 8}
-    };
-
     bool adj = false;
-    for (int i=0; i<4; ++i){
-        if (adjacency[sq1][i] == sq2){
-            adj = true;
-            break;
-        }
+    if (sq1 == 1 && (sq2 == 2 || sq2 == 4 || sq2 == 5)){
+        adj = true;
+    }else if (sq1 == 2 && (sq2 == 1 || sq2 == 3 || sq2 == 4 || sq2 == 5 || sq2 == 6)){
+        adj = true;
+    }else if (sq1 == 3 && (sq2 == 2 || sq2 == 5 || sq2 == 6)){
+        adj = true;
+    }else if (sq1 == 4 && (sq2 == 1 || sq2 == 2 || sq2 == 5 || sq2 == 7 || sq2 == 8)){
+        adj = true;
+    }else if (sq1 == 5 && (sq2 == 1 || sq2 == 2 || sq2 == 3 || sq2 == 4 || sq2 == 5 || sq2 == 6 || sq2 == 7 || sq2 == 8 || sq2 == 9)){
+        adj = true;
+    }else if (sq1 == 6 && (sq2 == 2 || sq2 == 3 || sq2 == 5 || sq2 == 8 || sq2 == 9)){
+        adj = true;       
+    }else if (sq1 == 7 && (sq2 == 4 || sq2 == 5 || sq2 == 8)){
+        adj = true;
+    }else if (sq1 == 8 && (sq2 == 4 || sq2 == 5 || sq2 == 6 || sq2 == 7 || sq2 == 9)){
+        adj = true;
+    }else if (sq1 == 9 && (sq2 == 5 || sq2 == 6 || sq2 == 8)){
+        adj = true;
+    }else{
+        adj = false;
     }
     
-    int hold;
+    int hold = 0;
 
     if (adj == false){
         cout << "\nSquare " << sq2 << " is not adjacent to square " << sq1 << ". Try again.\n";
@@ -375,7 +378,7 @@ void paladin(int player){
         clearInput(sq2);
         paladin(player);
     }else if (!isdigit(box[sq2])){
-        cout << "\nSquare " << sq2 << "is taken. Try again.\n";
+        cout << "\nSquare " << sq2 << " is taken. Try again.\n";
         clearInput(sq1);
         clearInput(sq2);
         paladin(player);
