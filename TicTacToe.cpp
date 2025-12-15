@@ -1,36 +1,51 @@
 #include <iostream>
 #include <string>
-#include <chrono>
-#include <thread>
-#include <utility>
+#include <vector>
+#include <algorithm>
 #include <cctype>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 template <typename T>
 void clearInput(T input){   // Function to clear invalid input
     cin.clear();
-    cin.ignore(10000, '\n');
+    cin.ignore(99999, '\n');
 }
 
+void pressEnter(){
+    cout << "Press enter twice to continue: ";
+    cin.ignore(10000, '\n');
+    cin.get();
+}
+
+// Functions
+void checkMark(char mark);
+void chooseMark();
+void changeSquare(int i, int player, char mark);
+void alchemist(int player);
+void paladinCheck(int player, int sq1, int sq2);
+void paladin(int player);
+void battle(int battleNum);
+
+// Game variables
 int step = 0;                   // Keep track of each step of the game to progress story
 char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 int i = 0;      // Used to choose a square
+int turn = 1;
+bool battleEnd = false;
 
+// Player info
 string name = "Name";
 string classType = "Class";
 char mark = 'X';
-char opp = 'O';
-
-bool checkMark(char mark);
-void chooseMark();
-void changeSquare(int i, int player, char mark);
+char oppMark = 'O';
 
 // Player stats
 int health = 300;
 int attack = 100;
 int defense = 100;
 int money = 50;
-
 
 void display(void){
 
@@ -39,6 +54,14 @@ void display(void){
     cout << " " << box[4] << " | " << box[5] << " | " << box[6] << "\n";
     cout << "-----------" << "\n"; 
     cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
+}
+
+void resetBoard() {
+    for (int i = 1; i <= 9; ++i){
+        box[i] = '0' + i;
+    }
+    battleEnd = false;
+    turn = 0;
 }
 
 void events(){
@@ -51,8 +74,6 @@ void events(){
     // After battle 4, 
 }
 
-
-
 void stats(){
     cout << endl << name << "'s Stats:" << endl << "--------------" << endl;
     cout << "Class:    " << classType << endl;
@@ -62,68 +83,64 @@ void stats(){
     cout << "Money:     $" << money << endl << endl;
 }
 
-void battle(int battleNum){
-    // Opponent stats
-    int oppHealth;
-    int oppAttack;
-    int oppDefense;
+void win(int player, char mark){
 
-    if(battleNum == 1){
-        oppHealth = 250;
-        oppAttack = 35;
-        oppDefense = 15;
-    }else if(battleNum == 2){
-        oppHealth = 250;
-        oppAttack = 45;
-        oppDefense = 15;
-    }else if(battleNum == 3){
-        oppHealth;
-        oppAttack;
-        oppDefense;
-    }else if(battleNum == 4){
-        oppHealth;
-        oppAttack;
-        oppDefense;
-    }else if(battleNum == 5){
-        oppHealth;
-        oppAttack;
-        oppDefense;
-    }
-
-    while(oppHealth > 0){
-        //battle
-        /*
+    if(box[1] == mark && box[2] == mark && box[3] == mark){
+        battleEnd = true;
+    }else if(box[4] == mark && box[5] == mark && box[6] == mark){
+        battleEnd = true;
+    }else if(box[7] == mark && box[8] == mark && box[9] == mark){
+        battleEnd = true;
+    }else if(box[1] == mark && box[4] == mark && box[7] == mark){
+        battleEnd = true;
+    }else if(box[2] == mark && box[5] == mark && box[8] == mark){
+        battleEnd = true;
+    }else if(box[3] == mark && box[6] == mark && box[9] == mark){
+        battleEnd = true;
+    }else if(box[1] == mark && box[5] == mark && box[9] == mark){
+        battleEnd = true;
+    }else if(box[3] == mark && box[5] == mark && box[7] == mark){
+        battleEnd = true;
+    }else if (box[1] == mark && box[2] == mark && box[3] == mark && box[4] == mark && box[5] == mark && box[6] == mark && box[7] == mark && box[8] == mark && box[9] == mark){
         display();
-        */
-        //deduct points'
-        if(oppHealth <= 0){
-            //end battle
-            break;
-        }else if(health <= 0){
-            //end battle
-            //You lose message
-        }
+        cout << "The battle was a tie!\n";
+        battleEnd = true;
+    }else{
+        battleEnd = false;
     }
 
+    if(battleEnd == true && player == 1){
+        display();
+        cout << "You win the battle!\n";
+    }else if(battleEnd == true && player == 2){
+        display();
+        cout << "You lost the battle!\n";
+    }
 }
-
 
 void chooseSquare(int player, char mark){
 
-    // Different output depending on player
-    cout << "Player " << player <<", enter a number to choose a square: ";
+    if(player == 1){
+        cout << name <<", enter a number to choose a square: ";
+        cin >> i;       // Choose a square
 
-    cin >> i;       // Choose a square   
+        if (cin.fail()){
+            clearInput(i);
+            cout << "\nThat is not a valid square. Try again.\n\n";
+            chooseSquare(player, mark);
+        }else if (i < 1 || i > 9){
+            clearInput(i);
+            cout << "\nThat is not a valid square. Try again.\n\n";
+            chooseSquare(player, mark);
+        }else{
+            changeSquare(i, player, mark);
+        }
+    }else if(player == 2){
+        do{
+            i = rand() % 9 + 1;
+        }while (!isdigit(box[i]));
 
-    if (cin.fail()){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        return chooseSquare(player, mark);
-    }else if (i < 1 || i > 9){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        chooseSquare(player, mark);
-    }else{
+        cout << "Opponent chooses square " << i << endl;
         changeSquare(i, player, mark);
     }
 }
@@ -136,24 +153,32 @@ void changeSquare(int i, int player, char mark){
     }else if (isdigit(box[i])){
         box[i] = mark;
         win(player, mark);
+        turn++;
     }
 }
-
-
-
 
 void story(){
 
     if(step == 0){
         cout << "A group of thieves have stolen a precious family heirloom; A magical amulet.\nYou must go on a journey to find and retrieve that amulet before it is used for something terrible...\n\nIn this world, you have to use Tic-Tac-Toe to battle your opponents.";
     }else if(step == 1){
-        cout << "You begin your journey when (come back later)\n\n";
+        cout << "You begin your journey when a wild beast jumps out and blocks your path. You ready your attack, when you remember you have to fight using Tic-Tac-Toe. Surprisingly, the beast knows how to play.\n\n";
+
+        pressEnter();
         battle(1);
     }else if(step == 2){
-        cout << "\n\ninsert story here\n\n";
+        cout << "\n\nYou make your way to a nearby town and spot the thieves sitting at a table with drinks, as if they're celebrating. You ask them what they did to your amulet.\n\n'Hah! We sold that ol' thing to those greedy sirens by the beach. For a good amount, too,' one of the thieves exclaim.\n\nYou don't have to, but you fight the thieves anyway.\n\n";
+
+        pressEnter();
         battle(2);
     }else if(step == 3){
-        cout << "\n\nAfter defeating the thieves, you make your way to find the sirens that the thieves sold the amulet to. Who knows what those sirens will do.\n\n";
+        cout << "\n\nAfter defeating the thieves, you leave to find the sirens that the thieves sold the amulet to. Who knows what those sirens will do.\n\n";
+
+        cout << "Sitting by the beach, you find a group of sirens that seem to be in a mood. You approach them and ask to about the whereabouts of your amulet.\n\n'Go away! Can't you see we're upset?' The sirens initiate a battle with you out of frustration.";
+
+        pressEnter();
+        battle(3);
+
     }/*else if(step == 4){
 
     }else if(step == 5){
@@ -162,23 +187,22 @@ void story(){
     
 }
 
-bool checkMark(char mark, int player){
+void checkMark(char m){
     
-    if (isalpha(mark) || mark == '?' || mark == '!' || mark == '*' || mark == '~' || mark == '$' || mark == '%' || mark == '#' || mark != 'O'){
-        return true; 
+    if (isalpha(m) || m == '?' || m == '!' || m == '*' || m == '~' || m == '$' || m == '%' || m == '#' || mark == 'O'){
+        mark = m;
     }else{
         clearInput(mark);
         cout << "That is not a valid mark.\n";
         chooseMark();
     }
-    return false;
 }
 
 void chooseMark(){
-    char mark;
-    cout << "\n\nPlayer " << name << ", choose your mark for this game: ";
-    cin >> mark;
-    checkMark(mark);
+    char m;
+    cout << "\n" << name << ", choose your mark for this game\n(Note, opponents use 'O' and your default mark is 'X'): ";
+    cin >> m;
+    checkMark(m);
     
     stats();
     step++;
@@ -212,341 +236,23 @@ void setup(){
     chooseClass();
 }
 
-void game(){
-
-    story();
-    setup();
-    
-
-}
-
-/*
-int chooseSquare(int player, char playerSymbol){
-
-    // Different output depending on player
-    cout << "Player " << player <<", enter a number to choose a square: ";
-
-    cin >> i;       // Choose a square   
-    return checkInput(i, player, playerSymbol);
-}
-
-int checkInput(int i, int player, char playerSymbol){
-
-    if (cin.fail()){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else if (i < 1 || i > 9){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else{
-        return changeSquare(i, player, playerSymbol);
-    }
-    
-    return 1;
-}
-
-int changeSquare(int i, int player, char playerSymbol){
-
-    if (!isdigit(box[i])){
-        cout << "\nThat space is taken. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else if (isdigit(box[i])){
-        box[i] = playerSymbol;
-        win(player, playerSymbol);
-        turn++;
-    }
-    
-    return 1;
-}
-
-
-*/
-
-
-int main(){
-
-    game();
-
-    return 0;
-}
-
-
-
-
-/*#include <iostream>
-#include <string>
-#include <chrono>
-#include <thread>
-#include <utility>
-#include <cctype>
-using namespace std;
-
-template <typename T>
-void clearInput(T input){   // Function to clear invalid input
-    cin.clear();
-    cin.ignore(10000, '\n');
-}
-
-// Portfolio 1 variables
-char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-int i = 0;      // Used to choose a square
-int turn = 1;   // Keeps track of turns
-bool gameEnd = false;
-
-// Portfolio 2 variables
-char p1Mark, p2Mark, p1ClassChoose, p2ClassChoose, choice;
-string p1Class, p2Class;
-
-// Portfolio 1 functions
-void instructionsReg();
-void display();
-int chooseSquare(int player, char playerSymbol);
-int checkInput(int i, int player, char playerSymbol);
-int changeSquare(int i, int player, char playerSymbol);
-void win(int player, char playerSymbol);
-
-// Portfolio 2 functions
-void instructionBattle(void);
-bool checkMark(char mark, int player);
-void chooseMark(int player);
-bool checkClass(int classChoose, int player);
-void chooseClass(int player);
-void chooseMove(int player);
-void alchemist(int player);
-void paladinCheck(int player, int sq1, int sq2);
-void paladin(int player);
-void menu();
-void regularGame();
-void battleGame();
-char closingMenu(char choice);
-
-
-int main(){
-
-    do{
-        menu();
-        closingMenu(choice);
-    }while (choice != 'n');
-
-    return 0;
-}
-
-
-void instructionsReg(void){
-
-    cout << "Let's start this regular game of Tic Tac Toe!\n\n";
-
-    cout << "HOW TO PLAY\n";
-    cout << "-------------------------------\n\n";
-    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\n\n";
-    cout << "Player 1 is X, player 2 is O. Choose moves wisely, as you will only have 8 turns.\n\n";
-
-    cout << "The game will start in a few seconds.\nHave fun!";
-    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
-    cout << "\n";
-}
-
-void instructionBattle(void){
-
-    cout << "\nLet's start this battle game of Tic Tac Toe!\n\n";
-
-    cout << "HOW TO PLAY\n";
-    cout << "-------------------------------\n\n";
-    cout << "This is a two player game where you will take turns choosing an available square until one player wins.\nHowever, you will each have an ability to use.\nChoose moves wisely, as you will only have 8 turns.\n\n";
-
-    cout << "You will choose your marks & classes in a few seconds.\nHave fun!";
-    this_thread::sleep_for(chrono::seconds(9));                // Pauses before moving on, allows time to read instructions
-    cout << "\n";
-}
-
-void display(void){
-
-    cout << "\n " << box[1] << " | " << box[2] << " | " << box[3] << "\n";
-    cout << "-----------" << "\n"; 
-    cout << " " << box[4] << " | " << box[5] << " | " << box[6] << "\n";
-    cout << "-----------" << "\n"; 
-    cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
-    cout << "Turn: " << turn << "\n\n";
-}
-
-int chooseSquare(int player, char playerSymbol){
-
-    // Different output depending on player
-    cout << "Player " << player <<", enter a number to choose a square: ";
-
-    cin >> i;       // Choose a square   
-    return checkInput(i, player, playerSymbol);
-}
-
-int checkInput(int i, int player, char playerSymbol){
-
-    if (cin.fail()){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else if (i < 1 || i > 9){
-        clearInput(i);
-        cout << "\nThat is not a valid square. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else{
-        return changeSquare(i, player, playerSymbol);
-    }
-    
-    return 1;
-}
-
-int changeSquare(int i, int player, char playerSymbol){
-
-    if (!isdigit(box[i])){
-        cout << "\nThat space is taken. Try again.\n\n";
-        return chooseSquare(player, playerSymbol);
-    }else if (isdigit(box[i])){
-        box[i] = playerSymbol;
-        win(player, playerSymbol);
-        turn++;
-    }
-    
-    return 1;
-}
-
-void win(int player, char playerSymbol){
-
-    if (box[1] == playerSymbol && box[2] == playerSymbol && box[3] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[4] == playerSymbol && box[5] == playerSymbol && box[6] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[7] == playerSymbol && box[8] == playerSymbol && box[9] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[1] == playerSymbol && box[4] == playerSymbol && box[7] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[2] == playerSymbol && box[5] == playerSymbol && box[8] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[3] == playerSymbol && box[6] == playerSymbol && box[9] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[1] == playerSymbol && box[5] == playerSymbol && box[9] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if(box[3] == playerSymbol && box[5] == playerSymbol && box[7] == playerSymbol){
-        display();
-        cout << "Player " << player << " wins!\nThank you for playing!";
-        gameEnd = true;
-    }else if (box[1] == playerSymbol && box[2] == playerSymbol && box[3] == playerSymbol && box[4] == playerSymbol && box[5] == playerSymbol && box[6] == playerSymbol && box[7] == playerSymbol && box[8] == playerSymbol && box[9] == playerSymbol){
-        display();
-        cout << "\nThe game is a tie!\nThank you for playing!\n";
-        gameEnd = true;
-    }else{
-        gameEnd = false;
-    }  
-}
-
-bool checkMark(char mark, int player){
-    
-    if (isalpha(mark) || mark == '?' || mark == '!' || mark == '*' || mark == '~' || mark == '$' || mark == '%' || mark == '#'){
-        return true; 
-    }else{
-        clearInput(mark);
-        cout << "That is not a valid mark.\n";
-        chooseMark(player);
-    }
-    return false;
-}
-
-void chooseMark(int player){
-    char mark;
-    cout << "\nPlayer " << player << ", choose your mark for this game: ";
-    cin >> mark;
-    if (player == 1){
-        if (checkMark(mark, player)){
-            p1Mark = mark;
-        }
-    }else if (player == 2){
-        if (checkMark(mark, player)){
-            p2Mark = mark;
-        }
-    }
-}
-
-bool checkClass(int classChoose, int player){
-        
-    if (classChoose == 1 || classChoose == 2){
-        return true;
-    }else{
-        clearInput(classChoose);
-        cout << "That is not a valid class.\n";
-        chooseClass(player);
-    }
-    return false;
-}
-
-void chooseClass(int player){
-    int classChoose;
-    cout << "\nPlayer " << player << ", choose your archetype, (1) Alchemist, (2) Paladin: ";
-    cin >> classChoose;
-    if (player == 1){
-        if (checkClass(classChoose, player)){
-            p1ClassChoose = classChoose;
-            if (p1ClassChoose == 1){
-                p1Class = "Alchemist";
-            }else if (p1ClassChoose == 2){
-                p1Class = "Paladin";
-            }
-        }
-    }else if (player == 2){
-        if (checkClass(classChoose, player)){
-            p2ClassChoose = classChoose;
-            if (p2ClassChoose == 1){
-                p2Class = "Alchemist";
-            }else if (p2ClassChoose == 2){
-                p2Class = "Paladin";
-            }
-        }
-    }
-}
-
 void chooseMove(int player){
     char ch;
     
-    cout << "Player " << player <<", would you like to choose a regular move or us ability?\n";
+    cout << "Would you like to choose a regular move or us ability?\n";
     cout << "(a) Regular move\n(b) Use ability\n\n";
     cout << "Enter a or b: ";
     cin >> ch;
 
     if (ch == 'b'){
-        if (player == 1){
-            if (p1Class == "Alchemist"){
-                alchemist(1);
-            }else if (p1Class == "Paladin"){
-                paladin(1);
-            }
-        }else if (player == 2){
-            if (p2Class == "Alchemist"){
-                alchemist(2);
-            }else if (p2Class == "Paladin"){
-                paladin(2);
-            }
+
+        if(classType == "Alchemist"){
+            alchemist(1);
+        }else if(classType == "Paladin"){
+            paladin(1);
         }
     }else if (ch == 'a'){
-        if (player == 1){
-            chooseSquare(player, p1Mark);
-        }else if (player == 2){
-            chooseSquare(player, p2Mark);
-        }
-        
+        chooseSquare(player, mark);
     }else{
         clearInput(ch);
         cout << "That is not a valid move.\n\n";
@@ -572,11 +278,11 @@ void alchemist(int player){
         if (player == 1){
             clearInput(sq1);
             clearInput(sq2);
-            chooseSquare(player, p1Mark);
+            chooseSquare(player, mark);
         }else if (player == 2){
             clearInput(sq1);
             clearInput(sq2);
-            chooseSquare(player, p2Mark);
+            chooseSquare(player, mark);
         }
     }else if (sq1 < 1 || sq1 > 9 || sq2 < 1 || sq2 > 9){
         cout << "Invalid positions. Try again.\n";
@@ -590,11 +296,7 @@ void alchemist(int player){
         alchemist(player);
     }else{
         swap(box[sq1], box[sq2]);
-        if (player == 1){
-            win(player, p1Mark);
-        }else if (player == 2){
-            win(player, p2Mark);
-        }
+        win(player, mark);
         turn++;
     }
 }
@@ -634,11 +336,7 @@ void paladinCheck(int player, int sq1, int sq2){
         box[hold] = box[sq2];
         box[sq2] = box[sq1];
         box[sq1] = box[hold];
-        if (player == 1){
-            win(player, p1Mark);
-        }else if (player == 2){
-            win(player, p2Mark);
-        }
+        win(player, mark);
         turn++;
     }
 
@@ -673,85 +371,151 @@ void paladin(int player){
 
 }
 
-void menu(){
-    int chooseGame;
+void abilitySteal(){
+    char takePlayer, takeOpp;
+    do{
+        i = rand() % 9 + 1;
+    }while (!isdigit(box[i]));
 
-    cout << "Welcome! Please select which Tic Tac Toe game you want to play:\n";
-    cout << "(1) Regular game\n";
-    cout << "(2) Battle game\n";
+    if(box[i] == mark){
+        box[i] = i;
+        cout << "A thief stole one of your marks!";
+    }else{
+        abilitySteal();
+    }
+    
+}
 
-    while(true){
-        cin >> chooseGame;
+void abilityJumble(){
+    vector<char> allMarks;
+    for(int j=1; j<=9; ++j){
+        if (!isdigit(box[j])){
+            allMarks.push_back(box[j]);
+        }
+    }
+    //shuffle(allMarks.begin(), allMarks.end());
+    int index = 0;
 
-        if (chooseGame != 1 && chooseGame != 2){
-            cout << "\nThat is not a valid game. Try again: ";
-            clearInput(chooseGame);
-        }else if (chooseGame == 1){
-            regularGame();
-            break;
-        }else if (chooseGame == 2){
-            battleGame();
-            break;
+    for(int j=1; j<=9; ++j) {
+        if (!isdigit(box[j])) {
+            box[j] = allMarks[index++];
+        }
+    }
+
+    cout << "The sirens use their strong voice and jumble up the marks!";
+}
+
+void abilityPlace(){
+    int placed = 0;
+    for(int tries=0; tries<20 %% placed<2; ++tries){
+        int j =rand()%9 + 1;
+        if(isdigit(box[j])){
+            box[j] = oppMark;
+            placed++;
         }
     }
 }
 
-void regularGame(){
-    instructionsReg();
-
-    while (true){
-        display();
-        chooseSquare(1, 'X');
-        if (gameEnd == true){
-            break;
-        }
-        display();
-        chooseSquare(2, 'O');
-        if (gameEnd == true){
-            break;
+void abilitySwap(){
+    for(int j=1; j<=9; ++j){
+        if(box[j] == mark){
+            box[j] = oppMark;
+        }else if(box[j] == oppMark){
+            box[j] = mark;
         }
     }
 }
 
-void battleGame(){
-    instructionBattle();
-    chooseMark(1);
-    chooseMark(2);
-    chooseClass(1);
-    chooseClass(2);
+void abilityErase(){
+    for(int j=1; j<=9; ++j){
+        box[j] = j;
+    }
+}
 
-    while (true){
+void oppAbility(int battleNum, int oppTurns){
+    int randomMove = rand()%100;
+    if (battleNum==1) return;
+    if (randomMove >= 25) return;
+
+    switch(battleNum){
+        case 2: 
+            abilitySteal();
+            break;
+        case 3:
+            abilityJumble();
+            break;
+        case 4:
+            if(oppTurns % 3 == 0){
+                abilityPlace();
+            }
+            break;
+        case 5:
+            int kingAbility = rand()%2;
+            if(kingAbility == 0){
+                abilitySwap();
+            }else if(kingAbility == 1){
+                abilityErase();
+            }
+            break;
+    }
+}
+
+void battle(int battleNum){
+    // Opponent stats
+    int oppHealth;
+    int oppAttack;
+    int oppDefense;
+
+    if(battleNum == 1){
+        oppHealth = 250;
+        oppAttack = 35;
+        oppDefense = 15;
+    }else if(battleNum == 2){
+        oppHealth = 250;
+        oppAttack = 45;
+        oppDefense = 15;
+    }else if(battleNum == 3){
+        oppHealth = 250;
+        oppAttack = 50;
+        oppDefense = 20;
+    }else if(battleNum == 4){
+        oppHealth = 250;
+        oppAttack = 50;
+        oppDefense = 20;
+    }else if(battleNum == 5){
+        oppHealth = 300;
+        oppAttack = 55;
+        oppDefense = 25;
+    }
+
+    while(oppHealth > 0){
         display();
         chooseMove(1);
-        if (gameEnd == true){
-            break;
-        }
 
-        display();
-        chooseMove(2);
-        if (gameEnd == true){
+        //deduct points
+        if(oppHealth <= 0){
+            //end battle
             break;
+        }else if(health <= 0){
+            //end battle
+            //You lose message
         }
     }
 }
 
-char closingMenu(char choice){
-    cout << "\nWould you like to play again? (y/n): ";
-    cin >> choice;
 
-    if (choice == 'y' || choice == 'Y'){
-        choice = 'y';
-        cout << "\n";
-        return choice;
-    }else if (choice == 'n' || choice == 'N'){
-        cout << "\nThanks for playing!";
-        return choice;
-    }else{
-        cout << "\nInvalid choice.";
-        clearInput(choice);
-        return closingMenu(choice);
-    }
-    return 1;
+void game(){
+
+    story();
+    setup();
+    
+
 }
 
-*/
+int main(){
+
+    srand(time(0));
+    game();
+
+    return 0;
+}
