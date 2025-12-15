@@ -26,6 +26,7 @@ void changeSquare(int i, int player, char mark);
 void alchemist(int player);
 void paladinCheck(int player, int sq1, int sq2);
 void paladin(int player);
+void oppAbility(int battleNum);
 void battle(int battleNum);
 
 // Game variables
@@ -56,12 +57,12 @@ void display(void){
     cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
 }
 
-void resetBoard() {
+void resetBox() {
     for (int i = 1; i <= 9; ++i){
         box[i] = '0' + i;
     }
     battleEnd = false;
-    turn = 0;
+    turn = 1;
 }
 
 void events(){
@@ -161,6 +162,8 @@ void story(){
 
     if(step == 0){
         cout << "A group of thieves have stolen a precious family heirloom; A magical amulet.\nYou must go on a journey to find and retrieve that amulet before it is used for something terrible...\n\nIn this world, you have to use Tic-Tac-Toe to battle your opponents.";
+
+        pressEnter();
     }else if(step == 1){
         cout << "You begin your journey when a wild beast jumps out and blocks your path. You ready your attack, when you remember you have to fight using Tic-Tac-Toe. Surprisingly, the beast knows how to play.\n\n";
 
@@ -179,11 +182,14 @@ void story(){
         pressEnter();
         battle(3);
 
-    }/*else if(step == 4){
+    }else if(step == 4){
 
+        pressEnter();
+        battle(4);
     }else if(step == 5){
-
-    }*/
+        pressEnter();
+        battle(5);
+    }
     
 }
 
@@ -236,28 +242,34 @@ void setup(){
     chooseClass();
 }
 
-void chooseMove(int player){
-    char ch;
+void chooseMove(int player, int battleNum){
+
+    if(player == 1){
+        char ch;
     
-    cout << "Would you like to choose a regular move or us ability?\n";
-    cout << "(a) Regular move\n(b) Use ability\n\n";
-    cout << "Enter a or b: ";
-    cin >> ch;
+        cout << "Would you like to choose a regular move or us ability?\n";
+        cout << "(a) Regular move\n(b) Use ability\n\n";
+        cout << "Enter a or b: ";
+        cin >> ch;
 
-    if (ch == 'b'){
+        if (ch == 'b'){
 
-        if(classType == "Alchemist"){
-            alchemist(1);
-        }else if(classType == "Paladin"){
-            paladin(1);
+            if(classType == "Alchemist"){
+                alchemist(1);
+            }else if(classType == "Paladin"){
+                paladin(1);
+            }
+        }else if (ch == 'a'){
+            chooseSquare(player, mark);
+        }else{
+            clearInput(ch);
+            cout << "That is not a valid move.\n\n";
+            chooseMove(player, battleNum);
         }
-    }else if (ch == 'a'){
-        chooseSquare(player, mark);
-    }else{
-        clearInput(ch);
-        cout << "That is not a valid move.\n\n";
-        chooseMove(player);
+    }else if(player == 2){
+        oppAbility(battleNum);
     }
+    
 }
 
 void alchemist(int player){
@@ -407,7 +419,7 @@ void abilityJumble(){
 
 void abilityPlace(){
     int placed = 0;
-    for(int tries=0; tries<20 %% placed<2; ++tries){
+    for(int tries=0; tries<20 % placed<2; ++tries){
         int j =rand()%9 + 1;
         if(isdigit(box[j])){
             box[j] = oppMark;
@@ -432,10 +444,11 @@ void abilityErase(){
     }
 }
 
-void oppAbility(int battleNum, int oppTurns){
+void oppAbility(int battleNum){
     int randomMove = rand()%100;
-    if (battleNum==1) return;
-    if (randomMove >= 25) return;
+    if (randomMove >= 25){
+        chooseSquare(2, oppMark);
+    }
 
     switch(battleNum){
         case 2: 
@@ -445,7 +458,7 @@ void oppAbility(int battleNum, int oppTurns){
             abilityJumble();
             break;
         case 4:
-            if(oppTurns % 3 == 0){
+            if(turn % 3 == 0){
                 abilityPlace();
             }
             break;
@@ -485,16 +498,18 @@ void battle(int battleNum){
     }else if(battleNum == 5){
         oppHealth = 300;
         oppAttack = 55;
-        oppDefense = 25;
+        oppDefense = 30;
     }
 
     while(oppHealth > 0){
         display();
-        chooseMove(1);
+        chooseMove(1, battleNum);
+        chooseMove(2, battleNum);
 
         //deduct points
         if(oppHealth <= 0){
             //end battle
+            resetBox;
             break;
         }else if(health <= 0){
             //end battle
