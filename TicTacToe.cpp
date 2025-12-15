@@ -1,6 +1,281 @@
-// NOTE: I wasn't sure how to properly implement turns, so I just added a set counter. Sorry.
-
 #include <iostream>
+#include <string>
+#include <chrono>
+#include <thread>
+#include <utility>
+#include <cctype>
+using namespace std;
+
+template <typename T>
+void clearInput(T input){   // Function to clear invalid input
+    cin.clear();
+    cin.ignore(10000, '\n');
+}
+
+int step = 0;                   // Keep track of each step of the game to progress story
+char box[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+int i = 0;      // Used to choose a square
+
+string name = "Name";
+string classType = "Class";
+char mark = 'X';
+char opp = 'O';
+
+bool checkMark(char mark);
+void chooseMark();
+void changeSquare(int i, int player, char mark);
+
+// Player stats
+int health = 300;
+int attack = 100;
+int defense = 100;
+int money = 50;
+
+
+void display(void){
+
+    cout << "\n " << box[1] << " | " << box[2] << " | " << box[3] << "\n";
+    cout << "-----------" << "\n"; 
+    cout << " " << box[4] << " | " << box[5] << " | " << box[6] << "\n";
+    cout << "-----------" << "\n"; 
+    cout << " " << box[7] << " | " << box[8] << " | " << box[9] << "\n\n";
+}
+
+void events(){
+    // After battle 1, 
+
+    // After battle 2, find a tasty looking apple and give player option to eat it or not. it is poison
+
+    // After battle 3, shop
+
+    // After battle 4, 
+}
+
+
+
+void stats(){
+    cout << endl << name << "'s Stats:" << endl << "--------------" << endl;
+    cout << "Class:    " << classType << endl;
+    cout << "Health:   " << health << endl;
+    cout << "Attack:   " << attack << endl;
+    cout << "Defense:  " << defense << endl;
+    cout << "Money:     $" << money << endl << endl;
+}
+
+void battle(int battleNum){
+    // Opponent stats
+    int oppHealth;
+    int oppAttack;
+    int oppDefense;
+
+    if(battleNum == 1){
+        oppHealth = 250;
+        oppAttack = 35;
+        oppDefense = 15;
+    }else if(battleNum == 2){
+        oppHealth = 250;
+        oppAttack = 45;
+        oppDefense = 15;
+    }else if(battleNum == 3){
+        oppHealth;
+        oppAttack;
+        oppDefense;
+    }else if(battleNum == 4){
+        oppHealth;
+        oppAttack;
+        oppDefense;
+    }else if(battleNum == 5){
+        oppHealth;
+        oppAttack;
+        oppDefense;
+    }
+
+    while(oppHealth > 0){
+        //battle
+        /*
+        display();
+        */
+        //deduct points'
+        if(oppHealth <= 0){
+            //end battle
+            break;
+        }else if(health <= 0){
+            //end battle
+            //You lose message
+        }
+    }
+
+}
+
+
+void chooseSquare(int player, char mark){
+
+    // Different output depending on player
+    cout << "Player " << player <<", enter a number to choose a square: ";
+
+    cin >> i;       // Choose a square   
+
+    if (cin.fail()){
+        clearInput(i);
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        return chooseSquare(player, mark);
+    }else if (i < 1 || i > 9){
+        clearInput(i);
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        chooseSquare(player, mark);
+    }else{
+        changeSquare(i, player, mark);
+    }
+}
+
+void changeSquare(int i, int player, char mark){
+
+    if (!isdigit(box[i])){
+        cout << "\nThat space is taken. Try again.\n\n";
+        chooseSquare(player, mark);
+    }else if (isdigit(box[i])){
+        box[i] = mark;
+        win(player, mark);
+    }
+}
+
+
+
+
+void story(){
+
+    if(step == 0){
+        cout << "A group of thieves have stolen a precious family heirloom; A magical amulet.\nYou must go on a journey to find and retrieve that amulet before it is used for something terrible...\n\nIn this world, you have to use Tic-Tac-Toe to battle your opponents.";
+    }else if(step == 1){
+        cout << "You begin your journey when (come back later)\n\n";
+        battle(1);
+    }else if(step == 2){
+        cout << "\n\ninsert story here\n\n";
+        battle(2);
+    }else if(step == 3){
+        cout << "\n\nAfter defeating the thieves, you make your way to find the sirens that the thieves sold the amulet to. Who knows what those sirens will do.\n\n";
+    }/*else if(step == 4){
+
+    }else if(step == 5){
+
+    }*/
+    
+}
+
+bool checkMark(char mark, int player){
+    
+    if (isalpha(mark) || mark == '?' || mark == '!' || mark == '*' || mark == '~' || mark == '$' || mark == '%' || mark == '#' || mark != 'O'){
+        return true; 
+    }else{
+        clearInput(mark);
+        cout << "That is not a valid mark.\n";
+        chooseMark();
+    }
+    return false;
+}
+
+void chooseMark(){
+    char mark;
+    cout << "\n\nPlayer " << name << ", choose your mark for this game: ";
+    cin >> mark;
+    checkMark(mark);
+    
+    stats();
+    step++;
+    story();
+}
+
+void chooseClass(){
+    int classChoose;
+    
+    cout << "\n" << name << ", choose your archetype, (1) Alchemist, (2) Paladin: ";
+    cin >> classChoose;
+    if(classChoose == 1){
+        classType = "Alchemist";
+    }else if(classChoose == 2){
+        classType = "Paladin";
+    }else{
+        clearInput(classChoose);
+        cout << "Invalid class, try again.";
+        chooseClass();
+    }
+
+    chooseMark();
+
+}
+
+void setup(){
+
+    cout << "\n\nFirstly, what is your name, hero?: ";
+    cin >> name;
+
+    chooseClass();
+}
+
+void game(){
+
+    story();
+    setup();
+    
+
+}
+
+/*
+int chooseSquare(int player, char playerSymbol){
+
+    // Different output depending on player
+    cout << "Player " << player <<", enter a number to choose a square: ";
+
+    cin >> i;       // Choose a square   
+    return checkInput(i, player, playerSymbol);
+}
+
+int checkInput(int i, int player, char playerSymbol){
+
+    if (cin.fail()){
+        clearInput(i);
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
+    }else if (i < 1 || i > 9){
+        clearInput(i);
+        cout << "\nThat is not a valid square. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
+    }else{
+        return changeSquare(i, player, playerSymbol);
+    }
+    
+    return 1;
+}
+
+int changeSquare(int i, int player, char playerSymbol){
+
+    if (!isdigit(box[i])){
+        cout << "\nThat space is taken. Try again.\n\n";
+        return chooseSquare(player, playerSymbol);
+    }else if (isdigit(box[i])){
+        box[i] = playerSymbol;
+        win(player, playerSymbol);
+        turn++;
+    }
+    
+    return 1;
+}
+
+
+*/
+
+
+int main(){
+
+    game();
+
+    return 0;
+}
+
+
+
+
+/*#include <iostream>
 #include <string>
 #include <chrono>
 #include <thread>
@@ -170,7 +445,7 @@ void win(int player, char playerSymbol){
         display();
         cout << "Player " << player << " wins!\nThank you for playing!";
         gameEnd = true;
-    }else if (turn == 8){
+    }else if (box[1] == playerSymbol && box[2] == playerSymbol && box[3] == playerSymbol && box[4] == playerSymbol && box[5] == playerSymbol && box[6] == playerSymbol && box[7] == playerSymbol && box[8] == playerSymbol && box[9] == playerSymbol){
         display();
         cout << "\nThe game is a tie!\nThank you for playing!\n";
         gameEnd = true;
@@ -478,3 +753,5 @@ char closingMenu(char choice){
     }
     return 1;
 }
+
+*/
